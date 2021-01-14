@@ -81,6 +81,9 @@ class Cube():
             self.rect.center = old_center
         pygame.display.update()
 
+    def coordinate(self):
+        return self.y
+
 
 class Location():
     def __init__(self, screen, size):
@@ -132,19 +135,40 @@ class Location():
 class Block():
     def __init__(self):
         self.w_bl, self.h_nl = 40, 40
-        self.bl = pygame.transform.smoothscale(pygame.image.load('data\Grounds\gr1.jpg'), (self.w_bl, self.h_nl))
-        self.pos_xbl = 500
-        self.x_rel = 800
-        self.speed = 3
-
-    def block(self, i):
-        self.pos_xbl -= self.speed
-        screen.blit(self.bl, (self.pos_xbl * i, 440))
-        pygame.display.update()
+        self.bl = pygame.transform.smoothscale(pygame.image.load('data\Enemys\E0.png'), (self.w_bl // 2, self.h_nl))
+        self.pos_xbl = 800
+        self.speed = 5
+        self.isStart = True
 
     def generate_blocK(self):
-        for i in range(1, 2):
-            self.block(i)
+        if self.pos_xbl <= 0 or self.isStart:
+            self.spawn_block()
+            self.isStart = False
+        else:
+            self.move_block()
+
+    def spawn_block(self):
+        screen.blit(self.bl, (self.pos_xbl, 441))
+        pygame.display.update()
+        self.pos_xbl = 800
+
+    def move_block(self):
+        self.pos_xbl -= self.speed
+        screen.blit(self.bl, (self.pos_xbl, 440))
+        pygame.display.update()
+
+    def coordinate(self):
+        return self.pos_xbl
+
+
+def end_no():
+    bl_x = blck.coordinate()
+    bl_y = 441
+    cb_x = 200
+    cb_y = cub.coordinate()
+    if ((bl_x + 40 == cb_x or bl_x == cb_x) or (bl_x + 40 == cb_x + 20 or bl_x == cb_x + 20))\
+            and ((bl_y + 40 == cb_y or bl_y == cb_y) or bl_y == cb_y or bl_y == cb_y):
+        return True
 
 
 def start():
@@ -155,13 +179,13 @@ def start():
     loc.draw_bg()
     cub.draw_character()
     blck.generate_blocK()
-    render()
+    # render()
     # screen.fill((0, 0, 0))
 
 
 def render():
     """
-    Отрисовка сетки для отладки
+    Отрисовка сетки для отладки(для разработчика)
     """
     global screen
     for y in range(600 // 40):
@@ -177,15 +201,18 @@ if __name__ == "__main__":
     cub = Cube(screen, size)
     loc = Location(screen, size)
     blck = Block()
-    run = True
+    restart = True
     if start_screen(screen, clock):
-        while run:
-            clock.tick(60)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+        while restart:
+            run = True
+            while run:
+                clock.tick(60)
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        run = False
+                if end_no():
                     run = False
+                keys = pygame.key.get_pressed()
+                start()
 
-            keys = pygame.key.get_pressed()
-            start()
-
-    pygame.quit()
+            pygame.quit()
