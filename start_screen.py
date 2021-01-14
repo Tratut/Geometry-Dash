@@ -4,8 +4,8 @@ import pygame
 def start_screen(screen, clock):
     pygame.init()
     text = ["Geometry dash",
-            "",
-            "Нажмите кнопк для продолжения"]
+            "", "", "", "", "", "", "", "", "", "", "",
+            "Нажмите кнопкy для продолжения"]
     background = pygame.image.load('data\ofon.jpg')
     background = pygame.transform.scale(background, (800, 600))
     screen.blit(background, (0, 0))

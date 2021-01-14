@@ -30,6 +30,16 @@ def generate_level(level):
     return new_player, x, y
 
 
+class Tile(pygame.sprite.Sprite):
+    def __init__(self, tile_type, x, y):
+        super().__init__(tiles_group, all_sprites)
+        self.image = pygame.image.load(tile_type)
+        self.image = pygame.transform.scale(40, 40)
+        self.rect = self.image.get_rect()
+
+        self.add(tiles_group, all_sprites)
+
+
 class Game():
     def __init__(self, screen, size):
         self.screen = screen
@@ -64,6 +74,8 @@ class Game():
         self.rot_speed = 18
         self.last_update = pygame.time.get_ticks()
         self.rect = self.main_cube.get_rect()
+        self.pos_rot = 0  # проверка позиции после вращения
+        self.checker_rot = 0  # проверка того что вращение куба произошло 1 раз
 
         # блоки
         self.w_bl, self.h_nl = 40, 40
@@ -72,9 +84,17 @@ class Game():
         self.x_rel = 800
 
     def action(self, keys):
+        """
+        Отработка прыжка
+        """
         if not self.isJump:
             if keys[pygame.K_SPACE]:
                 self.isJump = True
+                if self.pos_rot == 0:
+                    self.pos_rot = 1
+                else:
+                    self.pos_rot = 0
+                    self.checker_rot = 0
         else:
             if self.jumpCount >= -10:
                 if self.jumpCount < 0:
@@ -90,13 +110,21 @@ class Game():
 
     def draw_character(self):
         if not self.isJump:
-            self.screen.blit(self.main_cube, (self.x, self.y))
+            if self.pos_rot == 0:
+                self.screen.blit(self.main_cube, (self.x, self.y))
+            elif self.pos_rot == 1:
+                self.screen.blit(self.main_cube, (self.x, self.y))
+                if self.checker_rot == 0:
+                    self.main_cube = pygame.transform.rotate(self.main_cube, 180)
+                    self.checker_rot = 1
         else:
             self.rotate()
-
         pygame.display.update()
 
     def draw_bg(self):
+        """
+        Отрисовка заднего фона
+        """
         self.pos_xbg -= self.speed_bg
 
         x_rel = self.pos_xbg % self.bg_w
@@ -107,6 +135,9 @@ class Game():
         self.draw_ground()
 
     def draw_ground(self):
+        """
+        Отрисовка земли
+        """
         self.pos_xg -= self.speed
 
         x_rel = self.pos_xg % self.g_w
@@ -116,6 +147,9 @@ class Game():
         screen.blit(self.g, (x_part2, 0))
 
     def rotate(self):
+        """
+        Вращение куба во время прыжка
+        """
         now = pygame.time.get_ticks()
         if now - self.last_update > 50:
             self.last_update = now
@@ -163,7 +197,6 @@ def render():
 
 
 if __name__ == "__main__":
-    pygame.init()
     clock = pygame.time.Clock()
     size = (800, 600)
     screen = pygame.display.set_mode(size)
