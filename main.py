@@ -1,4 +1,5 @@
 import pygame
+from start_screen import start_screen
 
 
 def load_level(filename):
@@ -128,26 +129,32 @@ class Game():
             self.rect.center = old_center
         pygame.display.update()
 
-    def block(self):
+    def block(self, i):
         self.pos_xbl -= self.speed
-        self.x_rel -= self.pos_xbl % self.w_bl
-        screen.blit(self.bl, (self.x_rel, 440))
+        screen.blit(self.bl, (self.pos_xbl * i, 440))
+        pygame.display.update()
 
-
-class Blocks():
-    pass
+    def generate_blocK(self):
+        for i in range(1, 2):
+            self.block(i)
 
 
 def start():
+    """
+    Запуск игры и др ее компонентов
+    """
     game.action(keys)
     game.draw_bg()
     game.draw_character()
-    game.block()
+    game.generate_blocK()
     # render()
     # screen.fill((0, 0, 0))
 
 
 def render():
+    """
+    Отрисовка сетки для отладки
+    """
     global screen
     for y in range(600 // 40):
         for x in range(800 // 40):
@@ -162,13 +169,14 @@ if __name__ == "__main__":
     screen = pygame.display.set_mode(size)
     game = Game(screen, size)
     run = True
-    while run:
-        clock.tick(60)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
+    if start_screen(screen, clock):
+        while run:
+            clock.tick(60)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
 
-        keys = pygame.key.get_pressed()
-        start()
+            keys = pygame.key.get_pressed()
+            start()
 
     pygame.quit()
