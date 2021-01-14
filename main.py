@@ -136,7 +136,7 @@ class Game():
 
     def draw_ground(self):
         """
-        Отрисовка земли
+        Отрисовка землии
         """
         self.pos_xg -= self.speed
 
