@@ -200,16 +200,11 @@ def render():
     pygame.display.update()
 
 
-
-
-
 if __name__ == "__main__":
     pygame.init()
     clock = pygame.time.Clock()
     size = (800, 600)
     screen = pygame.display.set_mode(size)
-
-
 
     restart = True
     if start_screen(screen, clock):
