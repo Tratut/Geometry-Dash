@@ -82,7 +82,8 @@ class Cube():
         pygame.display.update()
 
     def coordinate(self):
-        return self.y
+        image1_mask = pygame.mask.from_surface(self.main_cube)
+        return self.y, image1_mask
 
 
 class Location():
@@ -158,16 +159,21 @@ class Block():
         pygame.display.update()
 
     def coordinate(self):
-        return self.pos_xbl
+        image2_mask = pygame.mask.from_surface(self.bl)
+        return self.pos_xbl, image2_mask
 
 
 def end_no():
-    bl_x = blck.coordinate()
-    bl_y = 441
+    """
+    Проверка на столкновение
+    """
+    x = blck.coordinate()[0]
+    y = 441
+    image1_mask = blck.coordinate()[1]
     cb_x = 200
-    cb_y = cub.coordinate()
-    if ((bl_x + 40 == cb_x or bl_x == cb_x) or (bl_x + 40 == cb_x + 20 or bl_x == cb_x + 20))\
-            and ((bl_y + 40 == cb_y or bl_y == cb_y) or bl_y == cb_y or bl_y == cb_y):
+    cb_y = cub.coordinate()[0]
+    image2_mask = blck.coordinate()[1]
+    if image1_mask.overlap_area(image2_mask, (cb_x - x, cb_y - y)):
         return True
 
 
@@ -194,25 +200,32 @@ def render():
     pygame.display.update()
 
 
+
+
+
 if __name__ == "__main__":
+    pygame.init()
     clock = pygame.time.Clock()
     size = (800, 600)
     screen = pygame.display.set_mode(size)
-    cub = Cube(screen, size)
-    loc = Location(screen, size)
-    blck = Block()
+
+
+
     restart = True
     if start_screen(screen, clock):
         while restart:
+            cub = Cube(screen, size)
+            loc = Location(screen, size)
+            blck = Block()
             run = True
             while run:
                 clock.tick(60)
+                if end_no():
+                    run = False
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         run = False
-                if end_no():
-                    run = False
+                        restart = False
                 keys = pygame.key.get_pressed()
                 start()
-
-            pygame.quit()
+        pygame.quit()
